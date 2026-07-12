@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7da63d5e703fc46439ffa8db24674923, type: 3}
+  m_Name: Day3_Client_QuietVoice
+  m_EditorClassIdentifier: Assembly-CSharp::PhoneCallData
+  clientLine: "\u042F \u0441\u043B\u044B\u0448\u0430\u043B \u0442\u0443\u0442 \u043B\u044E\u0431\u044F\u0442
+    \u043F\u043E\u0448\u0435\u043B\u0435\u0441\u0442\u0435\u0442\u044C. \u041F\u043E\u0448\u0435\u043B\u0435\u0441\u0442\u0438\u043C?"
+  useClientLineParts: 1
+  clientLineParts:
+  - 
+  - 
+  typeClientLine: 1
+  charactersPerTypeStep: 2
+  typeStepDelay: 0.03
+  answerTemplateTokens:
+  - "\u041A\u043E\u043D\u0435\u0447\u043D\u043E"
+  - '-'
+  wordBank:
+  - "\u041F\u043E\u0448\u0435\u043B\u0435\u0441\u0442\u0438\u043C"
+  - "\u041F\u043E\u0431\u0443\u0440\u043C\u0430\u043B\u0434\u0438\u043C"
+  - "\u0423\u043C\u0440\u0435\u043C"
+  - "\u0423\u0431\u0435\u0436\u0438\u043C"
+  acceptedAnswers:
+  - answerName: "\u0412\u0435\u0440\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442"
+    wordsInOrder:
+    - "\u0432\u0434\u043E\u0445"
+    - "\u0436\u0434\u0438"
+    callerMoodDelta: 10
+    sectInfluenceDelta: -5
+    callerReaction: "\u041F\u043E\u0448\u0435\u043B\u0435\u0441\u0442\u0438\u043C"
+  - answerName: "\u0412\u0435\u0440\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442"
+    wordsInOrder:
+    - "\u0432\u0434\u043E\u0445"
+    - "\u0436\u0434\u0438"
+    callerMoodDelta: 10
+    sectInfluenceDelta: -5
+    callerReaction: "\u041F\u043E\u0431\u0443\u0440\u043C\u0430\u043B\u0434\u0438\u043C"
+  timeoutResult:
+    answerName: "\u041A\u043B\u0438\u0435\u043D\u0442 \u0438\u0441\u043F\u0443\u0433\u0430\u043B\u0441\u044F"
+    wordsInOrder: []
+    callerMoodDelta: -10
+    sectInfluenceDelta: 5
+    callerReaction: "\u0421\u0432\u044F\u0437\u044C \u043E\u0431\u043E\u0440\u0432\u0430\u043B\u0430\u0441\u044C."
+  timeLimit: 30
+  invalidAnswerReaction: "\u0422\u044B \u043A\u0430\u043A\u043E\u0439 \u0431\u0430\u043B\u0430\u043D\u0434\u044B
+    \u043E\u0431\u044A\u0435\u043B\u0441\u044F?"
+  invalidAnswerSectInfluenceDelta: 10
