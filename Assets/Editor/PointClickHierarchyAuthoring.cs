@@ -67,7 +67,7 @@ public static class PointClickHierarchyAuthoring
     private static void UpdatePngObjects(Transform root)
     {
         SetPair(root.Find("Bed"), "Room_Bed-2.png", "Room_Bed-1.png");
-        SetPair(root.Find("Book"), "Room_Book-2.png", "Room_Book-1.png");
+        SetVisualOnly(root.Find("Book"), "Room_Book-2.png");
         SetPair(root.Find("Television"), "Room_Tv_-2.png", "Room_Tv_-1.png");
         SetPair(root.Find("Garbage Basket"), "Room_Korzina_-2.png", "Room_Korzina_-1.png");
         CreateGarbageItems(root);
@@ -98,6 +98,28 @@ public static class PointClickHierarchyAuthoring
             sleepZone.GetComponent<Image>().raycastTarget = true;
         }
         EditorSceneManager.MarkSceneDirty(root.gameObject.scene);
+    }
+
+    private static void SetVisualOnly(Transform target, string spriteName)
+    {
+        if (target == null) return;
+        Image image = target.GetComponent<Image>();
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/HomePNG/" + spriteName);
+        if (image != null)
+        {
+            image.sprite = sprite;
+            image.color = Color.white;
+            image.raycastTarget = false;
+        }
+        HoverOutline hover = target.GetComponent<HoverOutline>();
+        if (hover != null)
+        {
+            hover.Hide();
+            hover.enabled = false;
+        }
+        Transform outline = target.Find("Hover Outline");
+        if (outline != null) outline.gameObject.SetActive(false);
+        EditorUtility.SetDirty(target.gameObject);
     }
 
     private static void CreateGarbageItems(Transform root)

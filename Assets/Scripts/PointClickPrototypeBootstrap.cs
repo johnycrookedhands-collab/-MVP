@@ -59,6 +59,7 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
 
         Canvas canvas = authoringPreview != null ? authoringPreview.GetComponent<Canvas>() : CreateCanvas();
         if (canvas.GetComponent<GraphicRaycaster>() == null) canvas.gameObject.AddComponent<GraphicRaycaster>();
+        DisableBookInteraction();
         if (authoringPreview == null) CreateSleepBackground(canvas.transform);
         CreateWordRewardMiniGame(canvas.transform);
         CreateDayLabel(canvas.transform);
@@ -175,37 +176,39 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
         TelevisionCloseButton closeButton = closeButtonObject.AddComponent<TelevisionCloseButton>();
         closeButton.Initialize(window);
 
+        // Put the click handler directly on the visible television Image. A
+        // nearly-transparent child Graphic can be culled by CanvasRenderer and
+        // consequently never participate in GraphicRaycaster results.
         Transform oldInteractionZone = television.transform.Find("Television Interaction Zone");
-        GameObject interactionZone = oldInteractionZone != null
-            ? oldInteractionZone.gameObject
-            : new GameObject("Television Interaction Zone", typeof(RectTransform), typeof(Image));
-        interactionZone.transform.SetParent(television.transform, false);
-        interactionZone.transform.SetAsLastSibling();
-        RectTransform interactionRect = interactionZone.GetComponent<RectTransform>();
-        interactionRect.anchorMin = Vector2.zero;
-        interactionRect.anchorMax = Vector2.one;
-        interactionRect.offsetMin = Vector2.zero;
-        interactionRect.offsetMax = Vector2.zero;
-        Image interactionImage = interactionZone.GetComponent<Image>();
-        interactionImage.sprite = television.GetComponent<Image>().sprite;
-        // Keep the graphic visually invisible but raycastable on every Unity UI
-        // backend; alpha hit testing still follows the television sprite.
-        interactionImage.color = new Color(1f, 1f, 1f, 0.001f);
-        ConfigurePixelPerfectRaycast(interactionImage);
-
+        if (oldInteractionZone != null) Object.Destroy(oldInteractionZone.gameObject);
         HoverOutline televisionHover = television.GetComponent<HoverOutline>();
-        Transform outline = television.transform.Find("Hover Outline");
-        if (televisionHover != null) televisionHover.enabled = false;
-        if (outline != null)
+        Transform televisionOutline = television.transform.Find("Hover Outline");
+        if (televisionOutline != null)
         {
-            HoverOutline interactionHover = interactionZone.GetComponent<HoverOutline>();
-            if (interactionHover == null) interactionHover = interactionZone.AddComponent<HoverOutline>();
-            interactionHover.SetOutline(outline.gameObject);
+            if (televisionHover == null) televisionHover = television.AddComponent<HoverOutline>();
+            televisionHover.enabled = true;
+            televisionHover.SetOutline(televisionOutline.gameObject);
         }
 
-        TelevisionButton button = interactionZone.GetComponent<TelevisionButton>();
-        if (button == null) button = interactionZone.AddComponent<TelevisionButton>();
+        TelevisionButton button = television.GetComponent<TelevisionButton>();
+        if (button == null) button = television.AddComponent<TelevisionButton>();
         button.Initialize(television.GetComponent<Image>(), window, controller);
+    }
+
+    private static void DisableBookInteraction()
+    {
+        if (authoringPreview == null || authoringPreview.book == null) return;
+        GameObject book = authoringPreview.book.gameObject;
+        Image image = book.GetComponent<Image>();
+        if (image != null) image.raycastTarget = false;
+        HoverOutline hover = book.GetComponent<HoverOutline>();
+        if (hover != null)
+        {
+            hover.Hide();
+            hover.enabled = false;
+        }
+        Transform outline = book.transform.Find("Hover Outline");
+        if (outline != null) outline.gameObject.SetActive(false);
     }
 
     private static Canvas CreateCanvas()

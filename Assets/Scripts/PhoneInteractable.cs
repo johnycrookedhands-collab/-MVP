@@ -29,6 +29,8 @@ public class PhoneInteractable : MonoBehaviour
     private static PhoneInteractable partnerIntroPhone;
     private static bool partnerIntroCompleted;
     private static bool partnerIntroRang;
+    private static readonly HashSet<int> usedDayCallIds = new HashSet<int>();
+    private static int usedCallsDay;
 
     [SerializeField] private PhoneCallUI phoneCallUI;
     [SerializeField] private PhoneCallData callData;
@@ -80,6 +82,8 @@ public class PhoneInteractable : MonoBehaviour
         partnerIntroPhone = null;
         partnerIntroCompleted = false;
         partnerIntroRang = false;
+        usedDayCallIds.Clear();
+        usedCallsDay = 0;
     }
 
     private void OnEnable()
@@ -129,6 +133,8 @@ public class PhoneInteractable : MonoBehaviour
         partnerIntroPhone = null;
         partnerIntroCompleted = GameDayState.CurrentDay != 1;
         partnerIntroRang = false;
+        usedDayCallIds.Clear();
+        usedCallsDay = GameDayState.CurrentDay;
         activePhones.Clear();
         preparedDay = GameDayState.CurrentDay;
     }
@@ -321,6 +327,7 @@ public class PhoneInteractable : MonoBehaviour
         if (currentCallData == null)
         {
             schedule.completed = true;
+            MarkUnavailableScheduledCall();
             return;
         }
 
@@ -418,11 +425,28 @@ public class PhoneInteractable : MonoBehaviour
     {
         if (ShouldUseCurrentDaySubfolder())
         {
+            if (usedCallsDay != GameDayState.CurrentDay)
+            {
+                usedDayCallIds.Clear();
+                usedCallsDay = GameDayState.CurrentDay;
+            }
+
             PhoneCallData[] dayCalls = Resources.LoadAll<PhoneCallData>(GetCurrentDayCallsFolder());
             PhoneCallData[] regularDayCalls = FilterRegularCalls(dayCalls);
-            if (regularDayCalls.Length > 0)
+            List<PhoneCallData> unusedCalls = new List<PhoneCallData>();
+            foreach (PhoneCallData candidate in regularDayCalls)
             {
-                return regularDayCalls[Random.Range(0, regularDayCalls.Length)];
+                if (candidate != null && !usedDayCallIds.Contains(candidate.GetInstanceID()))
+                {
+                    unusedCalls.Add(candidate);
+                }
+            }
+
+            if (unusedCalls.Count > 0)
+            {
+                PhoneCallData selected = unusedCalls[Random.Range(0, unusedCalls.Count)];
+                usedDayCallIds.Add(selected.GetInstanceID());
+                return selected;
             }
 
             return null;
@@ -441,6 +465,16 @@ public class PhoneInteractable : MonoBehaviour
         }
 
         return regularCalls[Random.Range(0, regularCalls.Length)];
+    }
+
+    private void MarkUnavailableScheduledCall()
+    {
+        totalRequiredCalls = Mathf.Max(answeredCalls, totalRequiredCalls - 1);
+        if (answeredCalls >= totalRequiredCalls)
+        {
+            canReturnHome = true;
+            ShowReturnHomePrompt();
+        }
     }
 
     private PhoneCallData[] FilterRegularCalls(PhoneCallData[] calls)

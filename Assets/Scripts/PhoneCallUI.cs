@@ -13,6 +13,10 @@ public class PhoneCallUI : MonoBehaviour
     [SerializeField] private TMP_Text clientLineText;
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private TMP_Text reactionText;
+    [Tooltip("Сколько секунд реакция клиента остаётся на экране после завершения печати и озвучки.")]
+    [SerializeField, Min(1f)] private float reactionReadingHoldDuration = 3f;
+    [Tooltip("Задержка между буквами реакции клиента после ответа игрока.")]
+    [SerializeField, Range(0.005f, 0.1f)] private float reactionCharacterDelay = 0.012f;
 
     [Header("Containers")]
     [SerializeField] private Transform answerContainer;
@@ -510,8 +514,7 @@ public class PhoneCallUI : MonoBehaviour
         else
         {
             isCallOpen = false;
-            reactionText.text = "Вы не успели ответить. Клиент недоволен.";
-            Invoke(nameof(CloseCall), 2f);
+            PresentNpcReaction("Вы не успели ответить. Клиент недоволен.");
         }
     }
 
@@ -525,8 +528,6 @@ public class PhoneCallUI : MonoBehaviour
         }
 
         PresentNpcReaction(answer.callerReaction);
-
-        Invoke(nameof(CloseCall), 2f);
     }
 
     private void FinishInvalidAnswer()
@@ -544,7 +545,6 @@ public class PhoneCallUI : MonoBehaviour
         }
 
         isCallOpen = false;
-        Invoke(nameof(CloseCall), 2f);
     }
 
     private void FinishDialogueOnlyCall()
@@ -611,14 +611,18 @@ public class PhoneCallUI : MonoBehaviour
     private IEnumerator TypeReactionRoutine(string line)
     {
         reactionText.text = string.Empty;
-        float delay = Mathf.Max(0.005f, defaultCharacterDelay);
+        float delay = Mathf.Max(0.005f, reactionCharacterDelay);
         for (int i = 0; i < line.Length; i++)
         {
             reactionText.text = line.Substring(0, i + 1);
             PlayLetterVoice(line[i]);
             yield return new WaitForSeconds(delay);
         }
+        // Closing is tied to the actual end of the reaction instead of a fixed
+        // timer started before the text and voice have finished.
+        yield return new WaitForSecondsRealtime(Mathf.Max(1f, reactionReadingHoldDuration));
         reactionRoutine = null;
+        CloseCall();
     }
 
     private void EnsureLetterVoice()
@@ -745,6 +749,8 @@ public class PhoneCallUI : MonoBehaviour
         letterPitchRange.x = Mathf.Clamp(letterPitchRange.x, -3f, 3f);
         letterPitchRange.y = Mathf.Clamp(letterPitchRange.y, letterPitchRange.x, 3f);
         defaultCharacterDelay = Mathf.Max(0.005f, defaultCharacterDelay);
+        reactionReadingHoldDuration = Mathf.Max(1f, reactionReadingHoldDuration);
+        reactionCharacterDelay = Mathf.Clamp(reactionCharacterDelay, 0.005f, 0.1f);
         if (string.IsNullOrEmpty(recordedAlphabet))
         {
             recordedAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
