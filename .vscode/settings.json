@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Cult Call 100.slnx"
+    "dotnet.defaultSolution": "Перед MVP.slnx"
 }
