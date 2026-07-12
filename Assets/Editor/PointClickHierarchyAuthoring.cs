@@ -75,6 +75,23 @@ public static class PointClickHierarchyAuthoring
         Transform bedOutline = root.Find("Bed/Hover Outline");
         if (sleepZone != null && bedOutline != null)
         {
+            RectTransform sleepRect = sleepZone as RectTransform;
+            RectTransform bedRect = root.Find("Bed") as RectTransform;
+            Image bedImage = bedRect != null ? bedRect.GetComponent<Image>() : null;
+            Image sleepImage = sleepZone.GetComponent<Image>();
+            if (sleepRect != null && bedRect != null)
+            {
+                sleepRect.anchorMin = bedRect.anchorMin;
+                sleepRect.anchorMax = bedRect.anchorMax;
+                sleepRect.pivot = bedRect.pivot;
+                sleepRect.anchoredPosition = bedRect.anchoredPosition;
+                sleepRect.sizeDelta = bedRect.sizeDelta;
+                sleepRect.localEulerAngles = bedRect.localEulerAngles;
+                sleepRect.localScale = bedRect.localScale;
+            }
+            sleepImage.sprite = bedImage != null ? bedImage.sprite : null;
+            sleepImage.color = Color.clear;
+            sleepImage.alphaHitTestMinimumThreshold = 0.2f;
             HoverOutline hover = sleepZone.GetComponent<HoverOutline>();
             if (hover == null) hover = sleepZone.gameObject.AddComponent<HoverOutline>();
             hover.SetOutline(bedOutline.gameObject);
@@ -103,7 +120,7 @@ public static class PointClickHierarchyAuthoring
             image.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/HomePNG/Room_Garbage-{i + 1}.png");
             image.color = Color.white;
             image.raycastTarget = true;
-            image.alphaHitTestMinimumThreshold = 0.1f;
+            image.alphaHitTestMinimumThreshold = 0.2f;
 
             Transform oldOutline = item.transform.Find("Hover Outline");
             GameObject outline = oldOutline != null ? oldOutline.gameObject : new GameObject("Hover Outline", typeof(RectTransform), typeof(Image));
@@ -133,7 +150,7 @@ public static class PointClickHierarchyAuthoring
         image.sprite = normal;
         image.color = Color.white;
         image.raycastTarget = true;
-        image.alphaHitTestMinimumThreshold = 0.1f;
+        image.alphaHitTestMinimumThreshold = 0.2f;
         Transform oldOutline = target.Find("Hover Outline");
         GameObject outline = oldOutline != null ? oldOutline.gameObject : new GameObject("Hover Outline", typeof(RectTransform), typeof(Image));
         outline.transform.SetParent(target, false);

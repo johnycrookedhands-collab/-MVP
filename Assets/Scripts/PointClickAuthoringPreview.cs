@@ -28,6 +28,18 @@ public class PointClickAuthoringPreview : MonoBehaviour
         changed |= Sync(garbagePile, ref layout.squarePilePosition, ref layout.squarePileSize);
         changed |= Sync(garbageBasket, ref layout.dropZonePosition, ref layout.dropZoneSize);
         changed |= Sync(sleepZone, ref layout.sleepZonePosition, ref layout.sleepZoneSize);
+        if (bed != null && sleepZone != null)
+        {
+            sleepZone.anchorMin = bed.anchorMin;
+            sleepZone.anchorMax = bed.anchorMax;
+            sleepZone.pivot = bed.pivot;
+            sleepZone.anchoredPosition = bed.anchoredPosition;
+            sleepZone.sizeDelta = bed.sizeDelta;
+            sleepZone.localEulerAngles = bed.localEulerAngles;
+            sleepZone.localScale = bed.localScale;
+            layout.sleepZonePosition = layout.bedPosition;
+            layout.sleepZoneSize = layout.bedSize;
+        }
         if (changed) UnityEditor.EditorUtility.SetDirty(layout);
     }
 

@@ -378,7 +378,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -95}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &623485302
@@ -815,6 +815,7 @@ GameObject:
   - component: {fileID: 911479909}
   - component: {fileID: 911479911}
   - component: {fileID: 911479910}
+  - component: {fileID: 911479912}
   m_Layer: 0
   m_Name: Garbage Basket
   m_TagString: Untagged
@@ -835,7 +836,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 116128769}
-  - {fileID: 1098245896}
   m_Father: {fileID: 1330849560}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -881,6 +881,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911479908}
   m_CullTransparentMesh: 1
+--- !u!114 &911479912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911479908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cd22e10dce94fb497f78162d90c8cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoverOutline
+  outline: {fileID: 116128768}
 --- !u!1 &983116392
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,17 +995,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1085265265}
-  m_LocalRotation: {x: -0.51794046, y: 0.022827923, z: -0.24898463, w: -0.81806064}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.82, y: 2, z: 0.58}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -11.340581}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1330849560}
   m_LocalEulerAnglesHint: {x: 59.18, y: 385.5, z: 48.5}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 583.97, y: -338}
-  m_SizeDelta: {x: 225, y: 583.6}
+  m_AnchoredPosition: {x: -41.9, y: -95.6}
+  m_SizeDelta: {x: 2080, y: 880}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1085265267
 MonoBehaviour:
@@ -1007,14 +1020,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 7113517c61b1e4949855e22e3235e838, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1045,55 +1058,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HoverOutline
   outline: {fileID: 1869127372}
---- !u!1 &1098245895
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1098245896}
-  - component: {fileID: 1098245897}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1098245896
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1098245895}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 911479909}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.36546743, y: 0.14117447}
-  m_AnchorMax: {x: 0.43686688, y: 0.312}
-  m_AnchoredPosition: {x: 175, y: 357.5}
-  m_SizeDelta: {x: -26, y: -123}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1098245897
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1098245895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cd22e10dce94fb497f78162d90c8cd9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HoverOutline
-  outline: {fileID: 116128768}
 --- !u!1 &1324915788
 GameObject:
   m_ObjectHideFlags: 0
@@ -1426,7 +1390,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -80.86, y: -94.5}
+  m_AnchoredPosition: {x: -41.9, y: -95.6}
   m_SizeDelta: {x: 2080, y: 880}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1509214027
@@ -1583,7 +1547,7 @@ RectTransform:
   m_GameObject: {fileID: 1741587100}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 15.17, y: 9.27, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 739611194}
@@ -1591,7 +1555,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -631, y: -29.6}
+  m_AnchoredPosition: {x: -437.88, y: -153.9}
   m_SizeDelta: {x: 90, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1741587102
@@ -2077,7 +2041,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.0000038146973, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2044133087
 MonoBehaviour:
@@ -2189,13 +2153,13 @@ MonoBehaviour:
   televisionInterfacePosition: {x: 0, y: -21}
   televisionInterfaceSize: {x: 1180, y: 420}
   bedSprite: {fileID: 21300000, guid: aa100000000000000000000000000006, type: 3}
-  bedPosition: {x: -80.86, y: -94.5}
+  bedPosition: {x: -41.9, y: -95.6}
   bedSize: {x: 2080, y: 880}
   bedRotation: 0
-  sleepZonePosition: {x: 583.97, y: -338}
-  sleepZoneSize: {x: 225, y: 583.6}
+  sleepZonePosition: {x: -41.9, y: -95.6}
+  sleepZoneSize: {x: 2080, y: 880}
   bookSprite: {fileID: 21300000, guid: aa100000000000000000000000000007, type: 3}
-  bookPosition: {x: -631, y: -29.6}
+  bookPosition: {x: -437.88, y: -153.9}
   bookSize: {x: 90, y: 120}
   bookRotation: 0
 --- !u!1660057539 &9223372036854775807

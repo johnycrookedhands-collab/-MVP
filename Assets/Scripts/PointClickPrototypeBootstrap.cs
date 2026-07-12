@@ -99,18 +99,30 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
     {
         TelevisionCreditsSchedule schedule = Resources.Load<TelevisionCreditsSchedule>("TelevisionCreditsSchedule");
         TelevisionCreditsDay day = schedule != null ? schedule.GetDay(GameDayState.CurrentDay) : null;
-        if (day == null || string.IsNullOrWhiteSpace(day.creditsText) || string.IsNullOrWhiteSpace(day.rewardWord)) return;
+        if (day == null || string.IsNullOrWhiteSpace(day.creditsText) || string.IsNullOrWhiteSpace(day.rewardWord))
+        {
+            // The television must remain interactive even when the content asset
+            // has no explicit entry for the current day (for example day 4 or 5).
+            day = new TelevisionCreditsDay
+            {
+                day = GameDayState.CurrentDay,
+                creditsText = "Режиссёр Анна Оператор Михаил Монтаж Елена Эфир продолжается",
+                rewardWord = "эфир",
+                scrollSpeed = 100f
+            };
+        }
 
         GameObject television = authoringPreview != null && authoringPreview.television != null
             ? authoringPreview.television.gameObject
             : CreatePanelObject(parent, "Television", sceneLayout != null ? sceneLayout.televisionPosition : GetEditablePosition("TelevisionPosition", new Vector2(600f, -190f)), sceneLayout != null ? sceneLayout.televisionSize : new Vector2(260f, 170f), new Color(0.07f, 0.08f, 0.1f, 1f));
         television.GetComponent<Image>().raycastTarget = true;
+        ConfigurePixelPerfectRaycast(television.GetComponent<Image>());
         if (authoringPreview == null && sceneLayout != null) television.GetComponent<RectTransform>().localEulerAngles = new Vector3(0f, 0f, sceneLayout.televisionRotation);
         if (authoringPreview == null && sceneLayout != null && sceneLayout.televisionSprite != null)
         {
             television.GetComponent<Image>().sprite = sceneLayout.televisionSprite;
             television.GetComponent<Image>().color = Color.white;
-            television.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            ConfigurePixelPerfectRaycast(television.GetComponent<Image>());
         }
         AddCenteredLabel(television.transform, "ТЕЛЕВИЗОР", 25f);
 
@@ -163,8 +175,36 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
         TelevisionCloseButton closeButton = closeButtonObject.AddComponent<TelevisionCloseButton>();
         closeButton.Initialize(window);
 
-        TelevisionButton button = television.GetComponent<TelevisionButton>();
-        if (button == null) button = television.AddComponent<TelevisionButton>();
+        Transform oldInteractionZone = television.transform.Find("Television Interaction Zone");
+        GameObject interactionZone = oldInteractionZone != null
+            ? oldInteractionZone.gameObject
+            : new GameObject("Television Interaction Zone", typeof(RectTransform), typeof(Image));
+        interactionZone.transform.SetParent(television.transform, false);
+        interactionZone.transform.SetAsLastSibling();
+        RectTransform interactionRect = interactionZone.GetComponent<RectTransform>();
+        interactionRect.anchorMin = Vector2.zero;
+        interactionRect.anchorMax = Vector2.one;
+        interactionRect.offsetMin = Vector2.zero;
+        interactionRect.offsetMax = Vector2.zero;
+        Image interactionImage = interactionZone.GetComponent<Image>();
+        interactionImage.sprite = television.GetComponent<Image>().sprite;
+        // Keep the graphic visually invisible but raycastable on every Unity UI
+        // backend; alpha hit testing still follows the television sprite.
+        interactionImage.color = new Color(1f, 1f, 1f, 0.001f);
+        ConfigurePixelPerfectRaycast(interactionImage);
+
+        HoverOutline televisionHover = television.GetComponent<HoverOutline>();
+        Transform outline = television.transform.Find("Hover Outline");
+        if (televisionHover != null) televisionHover.enabled = false;
+        if (outline != null)
+        {
+            HoverOutline interactionHover = interactionZone.GetComponent<HoverOutline>();
+            if (interactionHover == null) interactionHover = interactionZone.AddComponent<HoverOutline>();
+            interactionHover.SetOutline(outline.gameObject);
+        }
+
+        TelevisionButton button = interactionZone.GetComponent<TelevisionButton>();
+        if (button == null) button = interactionZone.AddComponent<TelevisionButton>();
         button.Initialize(television.GetComponent<Image>(), window, controller);
     }
 
@@ -213,6 +253,20 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
             : CreateAnchoredPanelObject(parent, "SleepZone", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), sleepZonePosition, new Vector2(420f, 170f), new Color(0.9f, 0.76f, 0.42f, 0.18f));
         zoneObject.GetComponent<Image>().color = Color.clear;
         zoneObject.GetComponent<Image>().raycastTarget = true;
+        if (authoringPreview != null && authoringPreview.bed != null)
+        {
+            RectTransform zoneRect = zoneObject.GetComponent<RectTransform>();
+            RectTransform bedRect = authoringPreview.bed;
+            zoneRect.anchorMin = bedRect.anchorMin;
+            zoneRect.anchorMax = bedRect.anchorMax;
+            zoneRect.pivot = bedRect.pivot;
+            zoneRect.anchoredPosition = bedRect.anchoredPosition;
+            zoneRect.sizeDelta = bedRect.sizeDelta;
+            zoneRect.localEulerAngles = bedRect.localEulerAngles;
+            zoneRect.localScale = bedRect.localScale;
+            zoneObject.GetComponent<Image>().sprite = bedRect.GetComponent<Image>().sprite;
+            ConfigurePixelPerfectRaycast(zoneObject.GetComponent<Image>());
+        }
 
         GameObject popupObject = CreateAnchoredPanelObject(
             zoneObject.transform,
@@ -222,9 +276,10 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
             new Vector2(0.5f, 0f),
             new Vector2(0f, 22f),
             new Vector2(390f, 74f),
-            Color.clear);
+            new Color(0.035f, 0.025f, 0.045f, 0.94f));
+        popupObject.GetComponent<Image>().raycastTarget = false;
 
-        AddCenteredLabel(popupObject.transform, "Отправиться спать", 28f);
+        AddCenteredLabel(popupObject.transform, "Отправиться спать", 30f, true);
         popupObject.SetActive(false);
 
         SleepZoneButton sleepZone = zoneObject.GetComponent<SleepZoneButton>();
@@ -234,11 +289,6 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
 
     private static void CreateWordRewardMiniGame(Transform parent)
     {
-        if (GameDayState.HasCompletedWordRewardForDay(GameDayState.CurrentDay))
-        {
-            return;
-        }
-
         IReadOnlyList<string> rewardWords = GetRewardWordsForCurrentDay();
         if (rewardWords == null || rewardWords.Count == 0)
         {
@@ -271,7 +321,7 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
                 if (garbageItem == null) continue;
                 GameObject garbage = garbageItem.gameObject;
                 Image image = garbage.GetComponent<Image>();
-                if (image != null) image.raycastTarget = true;
+                if (image != null) ConfigurePixelPerfectRaycast(image);
                 MiniGameSquare sceneSquare = garbage.GetComponent<MiniGameSquare>();
                 if (sceneSquare == null) sceneSquare = garbage.AddComponent<MiniGameSquare>();
                 sceneSquare.Initialize(dropZone);
@@ -329,16 +379,18 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
         GameObject dropZoneObject = authoringPreview != null && authoringPreview.garbageBasket != null
             ? authoringPreview.garbageBasket.gameObject
             : CreatePanelObject(parent, "MiniGameDropZone", sceneLayout != null ? sceneLayout.dropZonePosition : GetEditablePosition("SquareDropZonePosition", MiniGameDropZonePosition), sceneLayout != null ? sceneLayout.dropZoneSize : MiniGameZoneSize, new Color(0.24f, 0.2f, 0.12f, 0.82f));
-        dropZoneObject.GetComponent<Image>().raycastTarget = true;
+        Image dropZoneImage = dropZoneObject.GetComponent<Image>();
 
         MiniGameDropZone dropZone = dropZoneObject.GetComponent<MiniGameDropZone>();
         if (dropZone == null) dropZone = dropZoneObject.AddComponent<MiniGameDropZone>();
         if (authoringPreview == null && sceneLayout != null && sceneLayout.dropZoneSprite != null)
         {
-            dropZoneObject.GetComponent<Image>().sprite = sceneLayout.dropZoneSprite;
-            dropZoneObject.GetComponent<Image>().color = Color.white;
-            dropZoneObject.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            dropZoneImage.sprite = sceneLayout.dropZoneSprite;
+            dropZoneImage.color = Color.white;
         }
+        // Authored basket sprites are full-screen transparent layers. Without an
+        // alpha threshold their 1765x1307 RectTransform blocks the whole room.
+        ConfigurePixelPerfectRaycast(dropZoneImage);
         RectTransform[] authoredItems = GetAuthoredGarbageItems();
         int requiredCount = authoredItems.Length > 0
             ? authoredItems.Length
@@ -446,7 +498,7 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
         return panelObject;
     }
 
-    private static void AddCenteredLabel(Transform parent, string label, float fontSize)
+    private static void AddCenteredLabel(Transform parent, string label, float fontSize, bool improveContrast = false)
     {
         if (authoringPreview != null && parent != null && parent.name == "Television") return;
         GameObject labelObject = new GameObject("Label");
@@ -463,6 +515,22 @@ public class PointClickPrototypeBootstrap : MonoBehaviour
         text.fontSize = fontSize;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
+        text.raycastTarget = false;
+        if (improveContrast)
+        {
+            text.fontStyle = FontStyles.Bold;
+            text.outlineWidth = 0.22f;
+            text.outlineColor = new Color32(10, 6, 14, 255);
+            text.margin = new Vector4(12f, 8f, 12f, 8f);
+        }
+    }
+
+    private static void ConfigurePixelPerfectRaycast(Image image)
+    {
+        if (image == null) return;
+        image.raycastTarget = true;
+        if (image.sprite != null && image.sprite.texture != null && image.sprite.texture.isReadable)
+            image.alphaHitTestMinimumThreshold = 0.2f;
     }
 
     private static Sprite CreateSolidSprite()
@@ -545,6 +613,7 @@ public class TelevisionButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerExit(PointerEventData eventData) { image.color = idleColor; }
     public void OnPointerClick(PointerEventData eventData)
     {
+        GetComponent<HoverOutline>()?.Hide();
         miniGame.SetActive(true);
         miniGame.transform.SetAsLastSibling();
         controller.Begin();
@@ -720,7 +789,7 @@ public class SleepZoneButton : MonoBehaviour, IPointerEnterHandler, IPointerExit
     }
 }
 
-public class MiniGameSquare : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class MiniGameSquare : MonoBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private RectTransform rectTransform;
     private Canvas canvas;
@@ -728,6 +797,7 @@ public class MiniGameSquare : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private MiniGameDropZone dropZone;
     private Transform startParent;
     private Vector2 startPosition;
+    private Vector2 pointerOffset;
 
     private void Awake()
     {
@@ -746,19 +816,38 @@ public class MiniGameSquare : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         dropZone = targetDropZone;
     }
 
+    public void OnInitializePotentialDrag(PointerEventData eventData)
+    {
+        // Small, irregular garbage sprites must react immediately instead of
+        // losing the drag to EventSystem's default movement threshold.
+        eventData.useDragThreshold = false;
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
+        GetComponent<HoverOutline>()?.Hide();
         startParent = transform.parent;
         startPosition = rectTransform.anchoredPosition;
 
         transform.SetParent(canvas.transform, true);
         transform.SetAsLastSibling();
         canvasGroup.blocksRaycasts = false;
+        Vector2 pointerLocal;
+        RectTransform canvasRect = canvas.transform as RectTransform;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect, eventData.position, eventData.pressEventCamera, out pointerLocal);
+        pointerOffset = rectTransform.anchoredPosition - pointerLocal;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        Vector2 pointerLocal;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
+            out pointerLocal);
+        rectTransform.anchoredPosition = pointerLocal + pointerOffset;
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -810,6 +899,7 @@ public class MiniGameDropZone : MonoBehaviour, IDropHandler
     {
         requiredSquares = requiredSquareCount;
         rewardDay = day;
+        completed = GameDayState.HasCompletedWordRewardForDay(day);
         background = GetComponent<Image>();
 
         rewardWords.Clear();
